@@ -38,10 +38,16 @@ class ModelOutput(dict):
             return global_embedding.squeeze(-2)
         else:
             assert False
+
+    @property
+    def layer_embeddings(self):
+        return self.get('layer_embeddings', None)
     
     def __getitem__(self, key: Any) -> Any:
         if key == 'global_embeddings':
             return self.global_embeddings
+        elif key == 'layer_embeddings':
+            return self.layer_embeddings
         else:
             return super().__getitem__(key)
     

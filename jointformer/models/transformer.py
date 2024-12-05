@@ -44,13 +44,18 @@ class Transformer(nn.Module):
             is_causal: bool,
             attention_mask: torch.Tensor,
             **kwargs
-    ):
+    ) -> ModelOutput:
         #assert False, (self.token_embedding, input_ids)
         x = self.token_embedding(input_ids)
+        # List to store embeddings from each layer
+        # Start with initial embeddings (before any TransformerLayer)
+        layer_embeddings = [x]
         for _, layer in enumerate(self.layers):
             x = layer(x, is_causal=is_causal, mask=attention_mask)
+            layer_embeddings.append(x)
         x = self.layer_norm(x)
-        return ModelOutput(embeddings=x, attention_mask=attention_mask)
+        layer_embeddings[-1] = x
+        return ModelOutput(embeddings=x, attention_mask=attention_mask,layer_embeddings = layer_embeddings)
 
     def load_pretrained(self, filename, device='cpu'):
         state_dict = torch.load(filename, map_location=device, weights_only=True)['model']

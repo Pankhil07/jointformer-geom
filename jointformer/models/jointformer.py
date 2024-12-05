@@ -95,12 +95,14 @@ class Jointformer(Transformer, TrainableModel):
         outputs = super().forward(input_ids=input_ids, attention_mask=_attention_mask, is_causal=_is_causal)
         cls_embeddings = self._get_cls_embeddings(outputs['embeddings'], attention_mask=attention_mask)
         lm_embeddings = self._get_lm_embeddings(outputs['embeddings'], next_token_only)
-
+        # Extract layer_embeddings from Transformer output
+        layer_embeddings = outputs.get('layer_embeddings', None)
         if _is_causal:
             outputs["logits_generation"] = self.lm_head(lm_embeddings)
         else:
             outputs["logits_physchem"] = self.physchem_head(cls_embeddings)
             outputs["logits_prediction"] = self.prediction_head(cls_embeddings)
+            
 
         return ModelOutput(
             attention_mask=attention_mask,
@@ -110,6 +112,7 @@ class Jointformer(Transformer, TrainableModel):
             logits_generation=outputs.get('logits_generation', None),
             logits_physchem=outputs.get('logits_physchem', None),
             logits_prediction=outputs.get('logits_prediction', None),
+            layer_embeddings=layer_embeddings,  # Now included
             loss=None
         )
     
