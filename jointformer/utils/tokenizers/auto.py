@@ -24,7 +24,7 @@ class AutoTokenizer:
         elif config.tokenizer == "ESMTokenizer":
             return getattr(importlib.import_module(
                 "jointformer.utils.tokenizers.amp"),
-                "AMPTokenizer").from_config(config)
+                "AMPTokenizerWithPrefix").from_config(config)
         elif config.tokenizer == "HFTokenizer":
             return getattr(importlib.import_module(
                 "jointformer.utils.tokenizers.hf"),
